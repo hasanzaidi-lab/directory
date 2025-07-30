@@ -1,35 +1,40 @@
 
-
 # 👥 PeopleDirApp
 
-A lightweight, scalable iOS application built using UIKit and programmatic UI that fetches and displays a list of people from a remote RESTful API. Architected with MVVM to ensure separation of concerns, testability, and clean dependency management.
+A modern, lightweight iOS app built entirely with **UIKit** and **programmatic UI**, designed to fetch and display a directory of people from a remote API. Architected with **MVVM** for separation of concerns, scalability, and testability.
+
+---
 
 ## 📱 Tech Stack
 
-- **UIKit** – Programmatic view layer, no Storyboard/XIBs.
-- **MVVM Architecture** – ViewModel layer manages presentation logic, API decoupling.
-- **URLSession + Result<T, Error>** – Typed async networking abstraction.
-- **Dependency Injection** – API service injected into the ViewModel.
-- **Auto Layout** – NSLayoutConstraint-based layout, supports all screen sizes.
+* **UIKit** – Fully programmatic UI, no Storyboards/XIBs
+* **MVVM** – Separation of concerns with ViewModels managing presentation logic
+* **URLSession + Result\<T, Error>** – Type-safe networking layer
+* **Dependency Injection** – ViewModels receive injected API services
+* **Auto Layout** – Responsive UI built with `NSLayoutConstraint`
+* **Dark Mode Support** – Adapts to system appearance (light/dark)
 
 ---
 
 ## 🧱 Project Structure
 
-```plaintext
+```
 PeopleDirApp/
 ├── Models/
-│   └── Person.swift                # Codable struct representing a person
+│   └── Person.swift                 # Codable struct for person data
 ├── Views/
-│   └── PersonTableViewCell.swift  # Custom UITableViewCell with labels
+│   └── PersonTableViewCell.swift   # Custom UITableViewCell
 ├── ViewModels/
-│   └── PeopleViewModel.swift      # Observable ViewModel exposes data + error
+│   └── PeopleViewModel.swift       # Exposes state, handles business logic
 ├── Services/
-│   └── APIService.swift           # URLSession logic with Result<T, Error>
+│   └── APIService.swift            # Abstracted network layer using Result
 ├── Controllers/
-│   └── PeopleViewController.swift # UITableViewController that binds to VM
+│   ├── PeopleViewController.swift  # Displays people list using UITableView
+│   └── PersonDetailViewController.swift # Modern detail view with avatar & info
+├── Utilities/
+│   └── ImageLoader.swift           # Simple image caching with NSCache
 ├── Resources/
-│   └── Assets.xcassets            # App icons, launch assets
+│   └── Assets.xcassets             # App icons, system images, launch assets
 └── AppDelegate.swift / SceneDelegate.swift
 ```
 
@@ -37,78 +42,88 @@ PeopleDirApp/
 
 ## ⚙️ Features
 
-* ✅ **Remote Fetching**: Fetches data from an external REST API.
-* ✅ **MVVM-Ready**: ViewModels expose observable state and decouple API layer.
-* ✅ **Typed Error Handling**: Custom `APIError` enum allows for detailed error resolution.
-* ✅ **No Storyboard Dependency**: Built entirely with UIKit programmatic views.
-* ✅ **Black Screen Fix**: Scene lifecycle manually initializes the root view in code.
+✅ Remote API Fetch with Loading State
+✅ MVVM Architecture with Clean ViewModel Bindings
+✅ Modern UI Design for List and Detail Views
+✅ Typed Error Handling via `APIError` Enum
+✅ Fully Programmatic UIKit Layout (No Storyboards)
+✅ Safe Image Loading with NSCache
+✅ Scene-based App Launch
 
 ---
 
 ## 🚀 How It Works
 
-1. `SceneDelegate` bootstraps the app by instantiating `PeopleViewController` and injecting the `ViewModel`.
-2. `PeopleViewModel` makes a network request using `APIService`.
-3. Results are published to the ViewController via closures or delegate binding.
-4. `PeopleViewController` displays fetched `Person` objects in a custom cell.
-5. Errors (e.g., `.invalidURL`, `.decodingFailed`) are printed or handled gracefully.
+1. **SceneDelegate** initializes `PeopleViewController`, injecting the ViewModel.
+2. `PeopleViewModel` fetches data from a REST API via `APIService`.
+3. The controller observes state via closures or delegate and reloads UI accordingly.
+4. On selection, it navigates to a **detail view** displaying avatar, name, and email in a clean stack layout.
+5. Networking errors are surfaced and gracefully handled.
 
 ---
 
 ## 🔐 Error Handling
 
-All networking errors conform to `LocalizedError` via a custom `APIError`:
+All network failures are captured in a typed enum:
 
 ```swift
-enum APIError: Error {
+enum APIError: Error, LocalizedError {
     case invalidURL
     case requestFailed(Error)
     case decodingFailed(Error)
     case unknown
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidURL: return "Invalid URL."
+        case .requestFailed(let err): return "Network error: \(err.localizedDescription)"
+        case .decodingFailed(let err): return "Failed to parse response: \(err.localizedDescription)"
+        case .unknown: return "An unknown error occurred."
+        }
+    }
 }
 ```
-
-Each case returns a localized error description for debugging and potential user-facing alerts.
 
 ---
 
 ## 🧪 Testing Strategy
 
-* ViewModels are unit-testable in isolation by mocking `APIService`.
-* No reliance on UIKit in the model or network layers.
-* Result type ensures compile-time safety and explicit error propagation.
+* ViewModels are unit-testable with **mocked services**
+* No UIKit dependencies in business logic
+* `Result` enables compile-time safety for async outcomes
+* Each error case is verifiable independently
 
 ---
 
-## 💡 Design Philosophy
+## 💡 Design Principles
 
-* ✅ Single Responsibility: Views display data, ViewModels manage it.
-* ✅ Testability First: All business logic extracted from controllers.
-* ✅ UIKit Fidelity: Preferred for fine-grained control and legacy integration.
-* ✅ Lightweight: No third-party dependencies.
+✅ **Single Responsibility**: Views display UI only, ViewModels manage logic
+✅ **Testability First**: Clean separation of concerns
+✅ **UIKit Precision**: Preferred for granular layout and enterprise compatibility
+✅ **Lightweight**: Zero external dependencies
+✅ **Dark Mode**: Uses system color schemes and SF Symbols
 
 ---
 
 ## 🛠️ Future Improvements
 
-* Add pull-to-refresh using `UIRefreshControl`
-* Migrate to Combine/Swift Concurrency
-* Add persistence via Core Data
-* Unit and snapshot tests with XCTest + XCUITest
-* CI integration with GitHub Actions
+* 🔄 Pull-to-refresh with `UIRefreshControl`
+* 🔁 Migrate to Combine or Swift Concurrency
+* 💾 Local persistence using Core Data
+* 🧪 Unit + Snapshot Tests (`XCTest`, `XCUITest`)
+* ⚙️ GitHub Actions for CI/CD pipeline
 
 ---
 
 ## 📸 Screenshots
 
-Coming soon…
+> Coming soon – showcasing both list and detail views in light & dark mode.
 
 ---
 
 ## 👨🏻‍💻 Author
 
-Hasan Zaidi
-Lead iOS Engineer with 10+ years of enterprise app experience
-Fintech • Connected Vehicles • Airlines • E-commerce • Healthcare
-
+**Hasan Zaidi**
+Lead iOS Engineer | 10+ years of experience
+Domains: Fintech • Connected Vehicles • Airlines • E-commerce • Healthcare
 
