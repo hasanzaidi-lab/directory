@@ -14,6 +14,7 @@ class PeopleListViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.register(PersonTableViewCell.self, forCellReuseIdentifier: PersonTableViewCell.reuseIdentifier)
         title = "People"
         view.backgroundColor = .systemBackground
         setupTableView()
@@ -58,25 +59,38 @@ class PeopleListViewController: UIViewController {
 
 extension PeopleListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.count
+        viewModel.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let person = viewModel.person(at: indexPath.row)
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+
         var config = UIListContentConfiguration.subtitleCell()
         config.text = "\(person.firstName) \(person.lastName)"
-        config.image = UIImage(systemName: "person.circle") // placeholder
+        config.secondaryText = person.email
+        config.image = UIImage(systemName: "person.circle") // default placeholder
+        config.imageProperties.cornerRadius = 20
+        config.imageProperties.maximumSize = CGSize(width: 40, height: 40)
+        config.textProperties.font = .boldSystemFont(ofSize: 17)
+        config.secondaryTextProperties.color = .darkGray
+
         cell.contentConfiguration = config
+        cell.selectionStyle = .none
+        cell.backgroundColor = .secondarySystemBackground
+        cell.layer.cornerRadius = 12
+        cell.clipsToBounds = true
 
         ImageLoader.shared.load(from: person.avatar) { image in
             DispatchQueue.main.async {
-                if let image = image {
-                    config.image = image
-                    cell.contentConfiguration = config
+                if let image = image, tableView.indexPath(for: cell) == indexPath {
+                    var updatedConfig = config
+                    updatedConfig.image = image
+                    cell.contentConfiguration = updatedConfig
                 }
             }
         }
+
         return cell
     }
 
@@ -85,4 +99,21 @@ extension PeopleListViewController: UITableViewDataSource, UITableViewDelegate {
         let detailVC = PersonDetailViewController(person: person)
         navigationController?.pushViewController(detailVC, animated: true)
     }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        80
+    }
+
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        cell.contentView.layer.masksToBounds = true
+        cell.contentView.layer.cornerRadius = 12
+        cell.contentView.layer.borderWidth = 0.5
+        cell.contentView.layer.borderColor = UIColor.separator.cgColor
+        cell.contentView.backgroundColor = .systemBackground
+
+        // Add vertical padding
+        let marginTransform = CGAffineTransform(translationX: 0, y: 5)
+        cell.transform = marginTransform
+    }
+
 }
