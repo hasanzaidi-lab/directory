@@ -111,15 +111,4 @@ Hasan Zaidi
 Lead iOS Engineer with 10+ years of enterprise app experience
 Fintech • Connected Vehicles • Airlines • E-commerce • Healthcare
 
----
 
-## 📄 License
-
-MIT
-
-```
-
----
-
-Would you like me to generate the actual `README.md` file for GitHub or include badges (e.g., Swift version, build status, license)?
-```
